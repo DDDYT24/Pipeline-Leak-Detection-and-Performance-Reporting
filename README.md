@@ -49,6 +49,21 @@ Pipeline and scenario configuration
 
 Measurement data can be imported into Power BI Desktop. Python handles the engineering calculations; the CSV interface keeps analysis independent of report presentation.
 
+## Repository guide
+
+| Path | Purpose |
+| --- | --- |
+| `configs/starter.json` | Assumed pipeline, sampling, noise, leak scenarios, and detector settings |
+| `src/pipeline_leak_detection/hydraulics.py` | Steady hydraulic calculations and prescribed midpoint leak state |
+| `src/pipeline_leak_detection/simulate.py` | Reproducible measurement, run, and separate event-truth generation |
+| `src/pipeline_leak_detection/detector.py` | Measurement-quality checks and two causal, sample-level detection rules |
+| `src/pipeline_leak_detection/cli.py` | Configuration loading, CSV export, and provenance manifest |
+| `tests/test_starter.py`, `tests/test_detector.py` | Hydraulic, data-generation, detector, and export checks |
+| `pyproject.toml`, `requirements-lock.txt` | Package metadata and repeatable dependency setup |
+| `.vscode/` | Local interpreter and data-generation/test tasks |
+
+`data/generated/` holds local CSV output. `reports/` holds local Power BI files. Their generated contents are excluded from Git.
+
 ## Model and units
 
 The model assumes one horizontal, constant-diameter pipe carrying a single-phase liquid with fixed density and viscosity. There are no elevation changes, branches, local fitting losses, intermediate pumps, or transient inventory changes.
@@ -81,7 +96,7 @@ The `instant-v1` rule evaluates each valid sample. The `trailing-v1` rule averag
 
 Missing flow values, suspect instrument status, and nonfinite or negative flow readings are `unavailable`. The trailing window resets after an invalid reading or a time gap and reports `warming` until six new valid samples are present. A confirmed alarm remains latched across an unavailable or warming period until a valid rule evaluation can clear it. The output distinguishes the current evaluation state from that retained alarm status.
 
-The detector reads only measurement fields. Event truth and run labels remain outside its input. A sample-level alarm is not an independently matched leak event.
+The detector reads only measurement fields; it uses `run_id` to keep replay histories separate. Event truth and scenario labels remain outside its input. A sample-level alarm is not an independently matched leak event.
 
 ## Reproduce the data
 
