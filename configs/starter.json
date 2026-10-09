@@ -1,0 +1,27 @@
+{
+  "config_version": "starter-v1",
+  "description": "Assumed parameters, not an Enbridge asset. Steady-state synthetic scenarios only.",
+  "pipeline": {
+    "length_m": 10000.0,
+    "diameter_m": 0.4,
+    "density_kgm3": 850.0,
+    "dynamic_viscosity_pas": 0.005,
+    "roughness_m": 0.000045,
+    "nominal_flow_m3h": 800.0,
+    "outlet_pressure_pa": 1000000.0
+  },
+  "simulation": {
+    "interval_s": 10,
+    "duration_s": 7200,
+    "leak_onset_s": 1200,
+    "leak_end_s": 6000,
+    "meter_noise_std_fraction": 0.002,
+    "pressure_noise_std_pa": 1000.0,
+    "synthetic_start_utc": "2026-09-01T00:00:00+00:00"
+  },
+  "scenarios": [
+    {"run_id": "normal-001", "leak_fraction": 0.0, "seed": 1001},
+    {"run_id": "leak-02-001", "leak_fraction": 0.02, "seed": 1002},
+    {"run_id": "leak-05-001", "leak_fraction": 0.05, "seed": 1003}
+  ]
+}

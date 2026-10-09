@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pipeline-leak-detection-reporting"
+version = "0.1.0"
+description = "Synthetic liquid-pipeline hydraulics and leak-detection performance reporting"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26", "pandas>=2.2", "fluids>=1.1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+pipeline-leak = "pipeline_leak_detection.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
