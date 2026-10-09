@@ -1,6 +1,14 @@
 # Pipeline Leak Detection and Performance Reporting
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 A Python engineering project exploring liquid-pipeline mass balance, measurement uncertainty, and the evidence needed to evaluate leak-detection decisions.
+
+## Documentation
+
+| Document | English | 简体中文 |
+| --- | --- | --- |
+| Project background, implemented scope, model, reproduction, and limitations | [README](README.md) | [中文说明](README.zh-CN.md) |
 
 ## Motivation
 
