@@ -19,6 +19,12 @@
     "pressure_noise_std_pa": 1000.0,
     "synthetic_start_utc": "2026-09-01T00:00:00+00:00"
   },
+  "detection": {
+    "threshold_fraction_nominal": 0.01,
+    "window_samples": 6,
+    "confirmation_samples": 3,
+    "version": "v1"
+  },
   "scenarios": [
     {"run_id": "normal-001", "leak_fraction": 0.0, "seed": 1001},
     {"run_id": "leak-02-001", "leak_fraction": 0.02, "seed": 1002},

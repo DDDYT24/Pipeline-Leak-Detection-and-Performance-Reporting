@@ -11,3 +11,5 @@ reports/*
 *.pbix
 *.pbit
 .env
+/Only for Tao/
+/AGENTS.md

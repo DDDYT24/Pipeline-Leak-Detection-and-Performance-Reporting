@@ -3,9 +3,10 @@
 from dataclasses import dataclass
 import math
 
-
 @dataclass(frozen=True)
 class Pipeline:
+    """保存管段参数；冻结实例，避免计算过程中意外修改配置。"""
+
     length_m: float
     diameter_m: float
     density_kgm3: float
@@ -15,6 +16,7 @@ class Pipeline:
     outlet_pressure_pa: float
 
     def __post_init__(self):
+        """尽早拒绝无物理意义或非有限的输入参数。"""
         positive = (self.length_m, self.diameter_m, self.density_kgm3,
                     self.dynamic_viscosity_pas, self.nominal_flow_m3h)
         if any(not math.isfinite(x) or x <= 0 for x in positive):

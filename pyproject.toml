@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pipeline-leak-detection-reporting"
-version = "0.1.0"
+version = "0.2.0"
 description = "Synthetic liquid-pipeline hydraulics and leak-detection performance reporting"
 requires-python = ">=3.11"
 dependencies = ["numpy>=1.26", "pandas>=2.2", "fluids>=1.1"]

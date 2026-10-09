@@ -1,14 +1,6 @@
 # Pipeline Leak Detection and Performance Reporting
 
-[English](README.md) | [简体中文](README.zh-CN.md)
-
 A Python engineering project exploring liquid-pipeline mass balance, measurement uncertainty, and the evidence needed to evaluate leak-detection decisions.
-
-## Documentation
-
-| Document | English | 简体中文 |
-| --- | --- | --- |
-| Project background, implemented scope, model, reproduction, and limitations | [README](README.md) | [中文说明](README.zh-CN.md) |
 
 ## Motivation
 
@@ -20,7 +12,7 @@ The project examines three practical engineering questions:
 - How much detection delay does a more persistent alarm rule introduce?
 - Why must missing or suspect instrument data be reported as unavailable rather than normal operation?
 
-These questions motivate the project. The current implementation establishes the physical calculations and reproducible measurement data needed to investigate them; it does not yet provide measured detector-performance answers.
+These questions motivate the project. The current implementation includes physical calculations, reproducible measurements, and two sample-level detection rules. Event-level performance and independent validation are still to be built.
 
 ## Incident background
 
@@ -37,10 +29,13 @@ The incident provides background for the engineering questions. Generated measur
 - A prescribed midpoint leak with mass conservation across two pipe segments.
 - Reproducible normal, 2% leak, and 5% leak scenarios with independent measurement noise.
 - Separate CSV exports for measurements, run metadata, and event ground truth.
+- A current-sample threshold baseline and a causal six-sample average with three-sample confirmation.
+- Explicit `unavailable` and `warming` states, with unresolved alarms retained through data gaps.
+- Per-sample detector output with rule version, residual, threshold, state, and data-quality reason.
 - An export manifest containing assumptions, configuration, package versions, and row counts.
-- Automated checks for engineering reference values, conservation, reproducibility, and invalid inputs.
+- Automated checks for hydraulic references, conservation, reproducibility, causal decisions, and invalid inputs.
 
-The repository currently contains the data-generation and hydraulics foundation. Detection algorithms, event-level performance metrics, and a Power BI report are not included in this snapshot.
+The repository now contains sample-level detection. Alarm episodes, event matching, false-alarm rates, missed-event counts, coverage metrics, and a shareable Power BI report are not included in this snapshot.
 
 ## Data flow
 
@@ -48,6 +43,7 @@ The repository currently contains the data-generation and hydraulics foundation.
 Pipeline and scenario configuration
     → Steady physical state
     → Noisy instrument measurements
+    → Per-sample data-quality and detector decisions
     → CSV exports and provenance manifest
 ```
 
@@ -77,6 +73,16 @@ Q_in = Q_out + Q_leak
 
 This is a steady-state prescribed-sink model, not a leak-orifice or transient-wave solver. A sudden change in the synthetic leak schedule switches between steady states without resolving the physical transition.
 
+## Detection rules and states
+
+Both rules use the positive mass-flow residual `density × (inlet flow − outlet flow) / 3600`, in kg/s. The default threshold is strictly greater than 1% of nominal mass flow, or approximately 1.889 kg/s (8 m³/h) for the starter configuration. This is an illustrative fixed threshold, not a calibrated operating setting.
+
+The `instant-v1` rule evaluates each valid sample. The `trailing-v1` rule averages the current and previous five valid samples and requires three consecutive above-threshold averages. Six samples taken ten seconds apart span 50 seconds from first to last sample; the rule does not model pipeline inventory or transient hydraulics.
+
+Missing flow values, suspect instrument status, and nonfinite or negative flow readings are `unavailable`. The trailing window resets after an invalid reading or a time gap and reports `warming` until six new valid samples are present. A confirmed alarm remains latched across an unavailable or warming period until a valid rule evaluation can clear it. The output distinguishes the current evaluation state from that retained alarm status.
+
+The detector reads only measurement fields. Event truth and run labels remain outside its input. A sample-level alarm is not an independently matched leak event.
+
 ## Reproduce the data
 
 Use Python 3.14 on Windows to reproduce the pinned environment, verified with Python 3.14.5.
@@ -96,13 +102,14 @@ The export directory defaults to `data/generated`. Re-running the generator repl
 | `readings.csv` | One run and one sampling interval | Noisy flow and pressure, mass imbalance, and instrument status |
 | `runs.csv` | One run | Seed, configuration version, synthetic date, and nominal hydraulic values |
 | `truth.csv` | One synthetic leak event | Onset, end, actual prescribed leak rate, and release volume |
+| `detector_results.csv` | One run, sample, and detection rule | Residual, smoothed residual, fixed threshold, quality reason, decision state, and retained alarm status |
 | `manifest.json` | One export | Data origin, assumptions, exact configuration, dependencies, and row counts |
 
-The default configuration produces 2,160 measurement rows across three two-hour runs sampled every ten seconds. Timestamps are synthetic and use UTC. Interval starts are inclusive and end boundaries are exclusive. Run metadata and truth are kept separate from measurements; the demo is not a held-out evaluation dataset.
+The default configuration produces 2,160 measurement rows and 4,320 detector rows across three two-hour runs sampled every ten seconds. Timestamps are synthetic and use UTC. Interval starts are inclusive and end boundaries are exclusive. Run metadata and truth are kept separate from detector inputs; the demo is not a held-out evaluation dataset.
 
 ## Verification
 
-Nine automated checks cover:
+Twenty-three automated checks cover:
 
 - SI conversions and nominal hydraulic reference values.
 - Comparison of the Haaland Darcy factor with the `fluids` friction calculation.
@@ -111,6 +118,11 @@ Nine automated checks cover:
 - Seed reproducibility and unique run timestamps.
 - Invalid geometry, leak rates, and partial sampling intervals.
 - Stopped and laminar flow handling.
+- Expected alarm timing for a zero-noise step leak and rejection of a single transient spike.
+- Instrument failure, time gaps, retained alarms, run isolation, causal prefix behavior, and structural input errors.
+- End-to-end export of separate measurement, truth, detector, and manifest files.
+
+For the seeded starter replay, both rules first flag the 2% leak after 1,200 seconds and 1,240 seconds, respectively. For the 5% leak, the first flags occur after 1,200 seconds and 1,230 seconds. These are first sample-level alarm times for these specific synthetic runs, not event-level detection rates. A zero-noise 2% step test produces a 50-second difference under the configured rules.
 
 The nominal example uses assumed values: length 10 km, diameter 0.4 m, density 850 kg/m³, viscosity 0.005 Pa·s, roughness 0.000045 m, and flow 800 m³/h. It yields approximately 1.768 m/s velocity, Reynolds number 120,250, and 0.589 MPa friction loss.
 
