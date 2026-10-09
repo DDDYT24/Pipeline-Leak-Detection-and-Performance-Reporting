@@ -12,7 +12,7 @@ The project examines three practical engineering questions:
 - How much detection delay does a more persistent alarm rule introduce?
 - Why must missing or suspect instrument data be reported as unavailable rather than normal operation?
 
-These questions motivate the project. The current implementation includes physical calculations, reproducible measurements, and two sample-level detection rules. Event-level performance and independent validation are still to be built.
+These questions motivate the project. The current implementation includes physical calculations, reproducible measurements, two causal detection rules, and event-level evaluation on a small synthetic starter set. Broader scenario testing and independent validation remain open.
 
 ## Incident background
 
@@ -32,10 +32,13 @@ The incident provides background for the engineering questions. Generated measur
 - A current-sample threshold baseline and a causal six-sample average with three-sample confirmation.
 - Explicit `unavailable` and `warming` states, with unresolved alarms retained through data gaps.
 - Per-sample detector output with rule version, residual, threshold, state, and data-quality reason.
+- Alarm episodes that retain open status and data interruptions until a valid rule evaluation clears them.
+- One-to-one matching of new alarms to separate leak truth, including late and missed events.
+- Run-level counts, exposure hours, monitoring coverage, and false-alarm frequency with explicit denominators.
 - An export manifest containing assumptions, configuration, package versions, and row counts.
 - Automated checks for hydraulic references, conservation, reproducibility, causal decisions, and invalid inputs.
 
-The repository now contains sample-level detection. Alarm episodes, event matching, false-alarm rates, missed-event counts, coverage metrics, and a shareable Power BI report are not included in this snapshot.
+The starter dataset is too small and simple to establish a general false-alarm reduction or operating performance. Independent scenario evaluation and a shareable Power BI performance report are not included in this snapshot.
 
 ## Data flow
 
@@ -44,6 +47,7 @@ Pipeline and scenario configuration
     → Steady physical state
     → Noisy instrument measurements
     → Per-sample data-quality and detector decisions
+    → Alarm episodes and event-level evaluation against separate truth
     → CSV exports and provenance manifest
 ```
 
@@ -57,8 +61,10 @@ Measurement data can be imported into Power BI Desktop. Python handles the engin
 | `src/pipeline_leak_detection/hydraulics.py` | Steady hydraulic calculations and prescribed midpoint leak state |
 | `src/pipeline_leak_detection/simulate.py` | Reproducible measurement, run, and separate event-truth generation |
 | `src/pipeline_leak_detection/detector.py` | Measurement-quality checks and two causal, sample-level detection rules |
+| `src/pipeline_leak_detection/alarms.py` | Confirmed-alarm episodes, resolution, and interruption tracking |
+| `src/pipeline_leak_detection/evaluation.py` | Truth matching, missed events, exposure denominators, and run metrics |
 | `src/pipeline_leak_detection/cli.py` | Configuration loading, CSV export, and provenance manifest |
-| `tests/test_starter.py`, `tests/test_detector.py` | Hydraulic, data-generation, detector, and export checks |
+| `tests/test_starter.py`, `tests/test_detector.py`, `tests/test_evaluation.py` | Hydraulic, detector, event-evaluation, and export checks |
 | `pyproject.toml`, `requirements-lock.txt` | Package metadata and repeatable dependency setup |
 | `.vscode/` | Local interpreter and data-generation/test tasks |
 
@@ -98,6 +104,14 @@ Missing flow values, suspect instrument status, and nonfinite or negative flow r
 
 The detector reads only measurement fields; it uses `run_id` to keep replay histories separate. Event truth and scenario labels remain outside its input. A sample-level alarm is not an independently matched leak event.
 
+## Event evaluation
+
+Consecutive latched alarm samples form one episode. Invalid or warming samples and missing intervals interrupt evaluation without resolving an existing alarm. An episode is resolved only when a valid rule evaluation clears the latch; otherwise it remains open at the run boundary.
+
+After detection, the evaluator compares alarm starts with separate synthetic truth. Each truth event can match only one newly started alarm in its half-open interval `[onset_s, end_s)`. An alarm already active before onset cannot detect the new event. Another alarm starting during the same leak is counted separately as a duplicate. An unmatched alarm beginning outside a leak interval counts as a false alarm under this predefined rule, including one first triggered after a leak ends. A match after 120 seconds remains an anytime detection but misses the 120-second target.
+
+`run_metrics.csv` keeps counts alongside scheduled, observed, valid, evaluable, and evaluable no-leak hours. Evaluation coverage is evaluable hours divided by scheduled hours. False alarms per 24 hours are false alarm episodes divided by evaluable no-leak hours, multiplied by 24. Detection rate is undefined when there are no truth events; false-alarm frequency is undefined when there are no eligible no-leak hours. Missing denominators are exported as blank values, never as zero risk. `true_release_before_alarm_m3` uses the generator's known release rate and detection delay; it is not a leak-volume estimate produced by the detector.
+
 ## Reproduce the data
 
 Use Python 3.14 on Windows to reproduce the pinned environment, verified with Python 3.14.5.
@@ -118,13 +132,16 @@ The export directory defaults to `data/generated`. Re-running the generator repl
 | `runs.csv` | One run | Seed, configuration version, synthetic date, and nominal hydraulic values |
 | `truth.csv` | One synthetic leak event | Onset, end, actual prescribed leak rate, and release volume |
 | `detector_results.csv` | One run, sample, and detection rule | Residual, smoothed residual, fixed threshold, quality reason, decision state, and retained alarm status |
+| `alarms.csv` | One confirmed alarm episode | Start, resolution or open status, interrupted duration, and truth-match classification |
+| `event_evaluation.csv` | One truth leak and detection rule | Matched alarm, delay, 120-second result, eligible-window coverage, and synthetic release before alarm |
+| `run_metrics.csv` | One run and detection rule | Event counts, misses, false alarms, coverage, exposure hours, and normalized frequency |
 | `manifest.json` | One export | Data origin, assumptions, exact configuration, dependencies, and row counts |
 
-The default configuration produces 2,160 measurement rows and 4,320 detector rows across three two-hour runs sampled every ten seconds. Timestamps are synthetic and use UTC. Interval starts are inclusive and end boundaries are exclusive. Run metadata and truth are kept separate from detector inputs; the demo is not a held-out evaluation dataset.
+The default configuration produces 2,160 measurement rows, 4,320 detector rows, four alarm episodes, four truth-by-method evaluation rows, and six run-by-method metric rows across three two-hour runs sampled every ten seconds. Timestamps are synthetic and use UTC. Interval starts are inclusive and end boundaries are exclusive. Run metadata and truth are kept separate from detector inputs; the demo is not a held-out evaluation dataset.
 
 ## Verification
 
-Twenty-three automated checks cover:
+Thirty-one automated checks cover:
 
 - SI conversions and nominal hydraulic reference values.
 - Comparison of the Haaland Darcy factor with the `fluids` friction calculation.
@@ -135,9 +152,10 @@ Twenty-three automated checks cover:
 - Stopped and laminar flow handling.
 - Expected alarm timing for a zero-noise step leak and rejection of a single transient spike.
 - Instrument failure, time gaps, retained alarms, run isolation, causal prefix behavior, and structural input errors.
+- Alarm episode boundaries, open alarms through invalid data, one-to-one truth matching, late and missed events, zero denominators, and inconsistent input rejection.
 - End-to-end export of separate measurement, truth, detector, and manifest files.
 
-For the seeded starter replay, both rules first flag the 2% leak after 1,200 seconds and 1,240 seconds, respectively. For the 5% leak, the first flags occur after 1,200 seconds and 1,230 seconds. These are first sample-level alarm times for these specific synthetic runs, not event-level detection rates. A zero-noise 2% step test produces a 50-second difference under the configured rules.
+For the seeded starter replay, the 2% leak has matched alarm delays of 0 and 40 seconds for the instant and trailing rules; the 5% leak has delays of 0 and 30 seconds. All four matched episodes resolve after their leak windows; the normal starter run has no alarm episodes. The trailing rule's synthetic true release before alarm is about 0.178 m³ for the 2% leak and 0.333 m³ for the 5% leak. A separate zero-noise 2% step test produces a 50-second difference under the configured rules. These example results do not demonstrate an overall false-alarm improvement or a field detection rate.
 
 The nominal example uses assumed values: length 10 km, diameter 0.4 m, density 850 kg/m³, viscosity 0.005 Pa·s, roughness 0.000045 m, and flow 800 m³/h. It yields approximately 1.768 m/s velocity, Reynolds number 120,250, and 0.589 MPa friction loss.
 

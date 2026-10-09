@@ -1,4 +1,4 @@
-"""SI-unit, horizontal, single-phase pipe calculations; Darcy friction factors."""
+"""用 SI 单位计算水平单相管流；摩擦系数采用 Darcy 定义。"""
 
 from dataclasses import dataclass
 import math
@@ -28,7 +28,7 @@ class Pipeline:
 
 
 def pipe_flow(pipeline: Pipeline, flow_m3h: float, length_m: float | None = None) -> dict:
-    """Compute steady friction loss. No elevation, local losses, pumps or transients."""
+    """计算指定管长的稳态摩擦压降，不含高差、局部损失或瞬态。"""
     if not math.isfinite(flow_m3h) or flow_m3h < 0:
         raise ValueError("Flow must be finite and nonnegative; reverse flow is not supported.")
     length = pipeline.length_m if length_m is None else length_m
@@ -54,7 +54,7 @@ def pipe_flow(pipeline: Pipeline, flow_m3h: float, length_m: float | None = None
 
 
 def segment_state(pipeline: Pipeline, leak_m3h: float) -> dict:
-    """Prescribed midpoint mass sink with fixed inlet flow and outlet pressure."""
+    """在固定入口流量和出口压力下计算中点指定泄漏的两段状态。"""
     if not math.isfinite(leak_m3h) or not 0 <= leak_m3h < pipeline.nominal_flow_m3h:
         raise ValueError("Prescribed leak must be nonnegative and below inlet flow.")
     upstream = pipe_flow(pipeline, pipeline.nominal_flow_m3h, pipeline.length_m / 2)

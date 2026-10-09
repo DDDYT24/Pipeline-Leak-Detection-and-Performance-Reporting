@@ -127,7 +127,7 @@ def test_suspect_meter_and_causal_prefix(starter_config):
 
 
 def test_cli_exports_detector_results_without_changing_truth(starter_config, tmp_path):
-    """端到端导出逐点结果，同时保留独立的事件真值与配置记录。"""
+    """端到端导出逐点和事件表，同时保留独立真值与配置记录。"""
     root = Path(__file__).parents[1]
     completed = subprocess.run(
         [
@@ -143,8 +143,14 @@ def test_cli_exports_detector_results_without_changing_truth(starter_config, tmp
     manifest = json.loads((tmp_path / "manifest.json").read_text(encoding="utf-8"))
     assert len(result) == 4320
     assert len(truth) == 2
+    assert len(pd.read_csv(tmp_path / "alarms.csv")) == 4
+    assert len(pd.read_csv(tmp_path / "event_evaluation.csv")) == 4
+    assert len(pd.read_csv(tmp_path / "run_metrics.csv")) == 6
     assert not set(truth.columns).intersection(set(result.columns) - {"run_id"})
     assert manifest["rows"]["detector_results"] == 4320
+    assert manifest["rows"]["alarms"] == 4
+    assert manifest["rows"]["event_evaluation"] == 4
+    assert manifest["rows"]["run_metrics"] == 6
     assert manifest["config"]["detection"] == starter_config["detection"]
 
 

@@ -1,4 +1,4 @@
-"""Starter synthetic measurements. Ground truth is exported separately."""
+"""生成可复现的合成测量，并将泄漏真值单独导出。"""
 
 from datetime import datetime, timedelta
 import math
@@ -9,6 +9,7 @@ from .hydraulics import Pipeline, pipe_flow, segment_state
 
 
 def generate(config: dict) -> dict[str, pd.DataFrame]:
+    """按配置生成逐点读数、回放信息和独立真值三张表。"""
     pipeline = Pipeline(**config["pipeline"])
     sim = config["simulation"]
     interval, duration = sim["interval_s"], sim["duration_s"]
