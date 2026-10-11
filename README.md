@@ -12,7 +12,7 @@ The project examines three practical engineering questions:
 - How much detection delay does a more persistent alarm rule introduce?
 - Why must missing or suspect instrument data be reported as unavailable rather than normal operation?
 
-These questions motivate the project. The current implementation includes physical calculations, reproducible measurements, two causal detection rules, and event-level evaluation on a small synthetic starter set. Broader scenario testing and independent validation remain open.
+These questions motivate the project. The implementation includes physical calculations, reproducible measurements, two causal detection rules, event-level evaluation, difficult synthetic scenarios, and a frozen-rule study with independent calibration/test seeds. Field and independent-physics validation remain open.
 
 ## Incident background
 
@@ -37,8 +37,24 @@ The incident provides background for the engineering questions. Generated measur
 - Run-level counts, exposure hours, monitoring coverage, and false-alarm frequency with explicit denominators.
 - An export manifest containing assumptions, configuration, package versions, and row counts.
 - Automated checks for hydraulic references, conservation, reproducibility, causal decisions, and invalid inputs.
+- Twelve difficult scenario templates, including 0.5% leaks, spikes, persistent meter bias, prescribed startup/shutdown ramps, leaks during startup, missing readings, flagged stuck meters, dropped samples, and leaks during data loss.
+- A separate calibration phase using predefined normal measurement windows, followed by a hash-bound frozen rule and disjoint test seeds.
+- Baseline white noise, higher white noise, and stationary AR(1) noise stress tests with scenario-level and pooled event summaries.
+- Matched-event delay P50/P95, misses, monitoring availability, and both full and jointly evaluable no-leak exposure denominators.
 
-The starter dataset is too small and simple to establish a general false-alarm reduction or operating performance. Independent scenario evaluation and a shareable Power BI performance report are not included in this snapshot.
+The starter dataset is too small and simple to establish general performance. The separate study evaluates new noise realizations under the same synthetic generator; it does not establish operating performance. This published version covers Stages 1-5. Power BI performance reporting and period-report delivery are outside this release.
+
+## Completed stages in this release
+
+| Stage | Completed work | Evidence and boundary |
+| --- | --- | --- |
+| 1 | Steady hydraulics, SI conversions, prescribed midpoint leak and reproducible measurements | Hydraulic reference/conservation tests; measurements, metadata and truth exported separately |
+| 2 | Current-sample threshold and causal trailing average with confirmation | Past/current inputs only; invalid data, warming, gaps and retained alarms tested |
+| 3 | Alarm episodes and one-to-one event evaluation | False alarms, missed events, delay and exposure denominators; no double counting |
+| 4 | Twelve scenario templates covering small leaks, spikes, bias, operating ramps and instrument/data failures | Expected successes and failures retained; ramps are signal stress tests, not transient hydraulics |
+| 5 | Normal-only calibration, frozen rule, disjoint test seeds and three noise profiles | 120 calibration and 360 test runs; event counts, coverage, shared exposure and delay quantiles |
+
+Version `0.5.0` publishes this Python scope. All signals are synthetic and use assumed parameters. See [the study procedure](docs/STAGE_4_5.md) and [release verification](docs/STAGE_1_5_RELEASE.md) for exact definitions, reproduction commands and limitations.
 
 ## Data flow
 
@@ -58,13 +74,17 @@ Measurement data can be imported into Power BI Desktop. Python handles the engin
 | Path | Purpose |
 | --- | --- |
 | `configs/starter.json` | Assumed pipeline, sampling, noise, leak scenarios, and detector settings |
+| `configs/study.json` | Difficult scenarios, calibration window, frozen-rule policy, noise profiles, and split seeds |
 | `src/pipeline_leak_detection/hydraulics.py` | Steady hydraulic calculations and prescribed midpoint leak state |
 | `src/pipeline_leak_detection/simulate.py` | Reproducible measurement, run, and separate event-truth generation |
 | `src/pipeline_leak_detection/detector.py` | Measurement-quality checks and two causal, sample-level detection rules |
 | `src/pipeline_leak_detection/alarms.py` | Confirmed-alarm episodes, resolution, and interruption tracking |
 | `src/pipeline_leak_detection/evaluation.py` | Truth matching, missed events, exposure denominators, and run metrics |
 | `src/pipeline_leak_detection/cli.py` | Configuration loading, CSV export, and provenance manifest |
-| `tests/test_starter.py`, `tests/test_detector.py`, `tests/test_evaluation.py` | Hydraulic, detector, event-evaluation, and export checks |
+| `src/pipeline_leak_detection/study.py` | Split expansion, normal-only calibration, rule freezing, common-time exposure, and event summaries |
+| `docs/STAGE_4_5.md` | Study procedure, signal definitions, output grains, and interpretation limits |
+| `scripts/verify_study_exports.py` | Replay every exported measurement and verify events, exposure, summaries and exact frozen calibration |
+| `tests/test_starter.py`, `tests/test_detector.py`, `tests/test_evaluation.py`, `tests/test_study.py` | Hydraulic, detector, event-evaluation, study isolation, and export checks |
 | `pyproject.toml`, `requirements-lock.txt` | Package metadata and repeatable dependency setup |
 | `.vscode/` | Local interpreter and data-generation/test tasks |
 
@@ -141,7 +161,7 @@ The default configuration produces 2,160 measurement rows, 4,320 detector rows, 
 
 ## Verification
 
-Thirty-one automated checks cover:
+Fifty-five automated checks cover:
 
 - SI conversions and nominal hydraulic reference values.
 - Comparison of the Haaland Darcy factor with the `fluids` friction calculation.
@@ -154,12 +174,30 @@ Thirty-one automated checks cover:
 - Instrument failure, time gaps, retained alarms, run isolation, causal prefix behavior, and structural input errors.
 - Alarm episode boundaries, open alarms through invalid data, one-to-one truth matching, late and missed events, zero denominators, and inconsistent input rejection.
 - End-to-end export of separate measurement, truth, detector, and manifest files.
+- Difficult-scenario successes and failures, fault injection boundaries, and separate truth during prescribed operating ramps.
+- Disjoint split seeds, reproducibility, causal AR(1) noise, normal-only calibration, and rejection of frozen-rule drift.
+- Pooled rates from summed counts and exposure, delay quantiles from matched events, common-time denominators, and calibration-to-test CLI exports.
 
 For the seeded starter replay, the 2% leak has matched alarm delays of 0 and 40 seconds for the instant and trailing rules; the 5% leak has delays of 0 and 30 seconds. All four matched episodes resolve after their leak windows; the normal starter run has no alarm episodes. The trailing rule's synthetic true release before alarm is about 0.178 m³ for the 2% leak and 0.333 m³ for the 5% leak. A separate zero-noise 2% step test produces a 50-second difference under the configured rules. These example results do not demonstrate an overall false-alarm improvement or a field detection rate.
 
 The nominal example uses assumed values: length 10 km, diameter 0.4 m, density 850 kg/m³, viscosity 0.005 Pa·s, roughness 0.000045 m, and flow 800 m³/h. It yields approximately 1.768 m/s velocity, Reynolds number 120,250, and 0.589 MPa friction loss.
 
 These checks establish implementation consistency for the stated assumptions. They do not establish leak-detection performance on operating assets.
+
+## Difficult scenarios and held-out noise study
+
+Run calibration first, then test with its saved frozen rule:
+
+```powershell
+.\.venv\Scripts\python.exe -m pipeline_leak_detection --study configs/study.json --phase calibration
+.\.venv\Scripts\python.exe -m pipeline_leak_detection --study configs/study.json --phase test --frozen-rule data/generated/study/calibration/frozen_rule.json
+```
+
+Calibration generates 120 two-hour runs. Only 7,200 valid measurements from ten predefined normal runs set the threshold: normal residual mean plus the larger of 1% nominal mass flow or four sample standard deviations. The six-sample window and three-sample confirmation are fixed beforehand. Test generation begins only after the saved rule's configuration, package version, and hash are verified; test results never update it.
+
+Testing generates 360 independent runs: twelve scenarios × ten replicates × three noise profiles. Each method evaluates 150 truth events across 720 scheduled test hours, with unavailable/warming time reported separately. These totals describe the prescribed scenario mix, not a representative pipeline operating history.
+
+Outputs go to `data/generated/study/calibration/` and `data/generated/study/test/`, alongside the existing starter exports. Each directory contains the seven base CSVs plus `comparison_exposure.csv`, `study_summary.csv`, `frozen_rule.json`, `manifest.json`, and `experiment_report.md`. See [the study procedure](docs/STAGE_4_5.md) for exact signal definitions and interpretation.
 
 ## Interpretation limits
 

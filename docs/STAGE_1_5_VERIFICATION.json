@@ -1,0 +1,86 @@
+{
+  "data_origin": "100% synthetic; assumed parameters; no field validation",
+  "package_version": "0.5.0",
+  "scope": "Stage 1-5 source snapshot: complete exports replayed; reporting implementation excluded",
+  "phases": {
+    "starter": {
+      "rows": {
+        "readings": 2160,
+        "runs": 3,
+        "truth": 2,
+        "detector_results": 4320,
+        "alarms": 4,
+        "event_evaluation": 4,
+        "run_metrics": 6
+      },
+      "status": "passed",
+      "csv_sha256": {
+        "readings": "88ae19c9e147920bf923b844cc7abe99c585a62af774b76f40bf0707d7ca3051",
+        "runs": "635c071aba68304c96f15de8a96f280ac0439f5e0fc93d7bc6550664d4ec2800",
+        "truth": "a637da823869b789db673f304779e6abaa9d63dad0066a7b4c508166b030f61d",
+        "detector_results": "d3a257b4d425646c4a1d46eace152892942d3973d26c5483be8d3b404e9fc088",
+        "alarms": "670e13fbb02fb908ad5cc764c037e2a2722440b381cc849bd597a96387925185",
+        "event_evaluation": "6d07c6fcf4793b553815f1fd1f605ad3fb3f3cbc4f57ed58e09fb30e462483b8",
+        "run_metrics": "f1d427f418f8f3e5a8b3b96c0e15cf434e724ed677c049587317d6489bd3d688"
+      }
+    },
+    "calibration": {
+      "rows": {
+        "readings": 86090,
+        "runs": 120,
+        "truth": 50,
+        "detector_results": 172180,
+        "alarms": 217,
+        "event_evaluation": 100,
+        "run_metrics": 240,
+        "comparison_exposure": 240,
+        "study_summary": 28
+      },
+      "status": "passed",
+      "csv_sha256": {
+        "readings": "d17d4b697b4c6916da90207e76c4dd5730bdcb80a6ce50b6de817456f0058c08",
+        "runs": "77da31f011420064d253f8cfaff8dcea569f791c745bbdb82e5c590f4a4abd41",
+        "truth": "fa978cbd1c266c951b18c1dc54c7949ab285d6235110077f9a0d93b697662dad",
+        "detector_results": "9e0b240735ce049dc121593c25b36d95f779b00848be23eae23375476dbfa149",
+        "alarms": "c16c2c26541e6898f96c4857600973f760bbf22b7f187d03b41662ee04574555",
+        "event_evaluation": "87832b63cd18ddfa917cd53622fe395ffdcbb798aa102f0d6607b65945cc5348",
+        "run_metrics": "87cdd362daa45b46e30e2c34072785cd21d5fa7f21e9db22cde1f42e866b3341",
+        "comparison_exposure": "ad736becdcb285827bdb96c52eedf92dd4ac362ea00100c1712a8553fad5fb47",
+        "study_summary": "a9ed8109c685010c0ccf061019eed0d0e6e37399f8f306bf9ef793f66e76d6a3"
+      }
+    },
+    "test": {
+      "rows": {
+        "readings": 258270,
+        "runs": 360,
+        "truth": 150,
+        "detector_results": 516540,
+        "alarms": 8482,
+        "event_evaluation": 300,
+        "run_metrics": 720,
+        "comparison_exposure": 720,
+        "study_summary": 80
+      },
+      "status": "passed",
+      "csv_sha256": {
+        "readings": "2863261b9b71735106d1474ee450a59d02efdb9b7191ae524352c798c379dacf",
+        "runs": "94bff68cd0927ddb2adff6d7612891ac6b0a38d6fea045ced480dbe4a0bd22ae",
+        "truth": "5bcc724a43dbbbba0ba064de36d9a9ec999fcb5c77f3dad98230626c4699c29c",
+        "detector_results": "6b765a90bef80d03574a7905c504d903d1da478eaf2845bc0663e20f2cb07d70",
+        "alarms": "2567019306f28cdc7d2360eeb248733cb2b69b6cc9aeae8a0da46846a447105f",
+        "event_evaluation": "3def6e2be7ca3ac405afc504fcd56850da508f72c406186fdeffd3abf5d5c581",
+        "run_metrics": "067ceeebcf917c26f5221089df99f3da3aeecdaa4b60c08ec579dffae9c502a6",
+        "comparison_exposure": "41065e7b840a237d6efa5f9334c7b78047c1341ecd26a8fb5f01e3fa4a2d0970",
+        "study_summary": "c46527f20475ab8079b21f02b8612971a0850aa0f3833812b3d784e914935154"
+      }
+    }
+  },
+  "status": "passed",
+  "rule_sha256": "39b5c085db08ad397e338190ce03356d15b7368e1e3f4e8ed8366bb4230c2764",
+  "verification_date": "2026-10-11",
+  "automated_tests": {
+    "passed": 55,
+    "elapsed_seconds": 62.2
+  },
+  "dependency_check": "passed"
+}

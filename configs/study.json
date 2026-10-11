@@ -1,0 +1,52 @@
+{
+  "study_version": "stage45-v1",
+  "description": "100% synthetic; assumed parameters. Prescribed signal stress, not transient hydraulics or field validation.",
+  "pipeline": {
+    "length_m": 10000.0, "diameter_m": 0.4, "density_kgm3": 850.0,
+    "dynamic_viscosity_pas": 0.005, "roughness_m": 0.000045,
+    "nominal_flow_m3h": 800.0, "outlet_pressure_pa": 1000000.0
+  },
+  "simulation": {
+    "interval_s": 10, "duration_s": 7200, "leak_onset_s": 1200,
+    "leak_end_s": 6000, "meter_noise_std_fraction": 0.002,
+    "pressure_noise_std_pa": 1000.0,
+    "synthetic_start_utc": "2026-09-01T00:00:00+00:00"
+  },
+  "splits": {
+    "calibration": {"seed_start": 10000, "replicates": 10},
+    "test": {"seed_start": 100000, "replicates": 10}
+  },
+  "calibration": {
+    "scenario": "normal", "noise_profile": "base_white",
+    "start_s": 0, "end_s": 7200,
+    "threshold_floor_fraction_nominal": 0.01, "std_multiplier": 4.0,
+    "window_samples": 6, "confirmation_samples": 3
+  },
+  "noise_profiles": [
+    {"name": "base_white", "meter_noise_std_fraction": 0.002, "noise_ar1": 0.0},
+    {"name": "high_white", "meter_noise_std_fraction": 0.006, "noise_ar1": 0.0},
+    {"name": "base_ar1", "meter_noise_std_fraction": 0.002, "noise_ar1": 0.8}
+  ],
+  "scenarios": [
+    {"scenario": "normal", "leak_fraction": 0.0},
+    {"scenario": "spike", "leak_fraction": 0.0,
+     "faults": [{"kind": "spike", "channel": "qin_m3h", "start_s": 1200, "end_s": 1210, "offset_m3h": 24.0}]},
+    {"scenario": "small_leak", "leak_fraction": 0.005},
+    {"scenario": "leak_2pct", "leak_fraction": 0.02},
+    {"scenario": "leak_5pct", "leak_fraction": 0.05},
+    {"scenario": "startup_shutdown", "leak_fraction": 0.0,
+     "operation": {"startup_start_s": 300, "startup_end_s": 600, "shutdown_start_s": 6600, "shutdown_end_s": 6900, "imbalance_fraction": 0.03}},
+    {"scenario": "startup_leak", "leak_fraction": 0.02, "leak_onset_s": 420,
+     "operation": {"startup_start_s": 300, "startup_end_s": 600, "shutdown_start_s": 6600, "shutdown_end_s": 6900, "imbalance_fraction": 0.03}},
+    {"scenario": "meter_bias", "leak_fraction": 0.0,
+     "faults": [{"kind": "bias", "channel": "qin_m3h", "start_s": 1200, "end_s": 6000, "offset_m3h": 16.0}]},
+    {"scenario": "missing_measurement", "leak_fraction": 0.0,
+     "faults": [{"kind": "missing", "channel": "qout_m3h", "start_s": 1190, "end_s": 1500}]},
+    {"scenario": "suspect_stuck", "leak_fraction": 0.0,
+     "faults": [{"kind": "suspect_stuck", "channel": "qout_m3h", "start_s": 1190, "end_s": 1500}]},
+    {"scenario": "dropped_samples", "leak_fraction": 0.0,
+     "faults": [{"kind": "dropout", "start_s": 1190, "end_s": 1500}]},
+    {"scenario": "leak_data_loss", "leak_fraction": 0.02,
+     "faults": [{"kind": "missing", "channel": "qout_m3h", "start_s": 1190, "end_s": 1500}]}
+  ]
+}
