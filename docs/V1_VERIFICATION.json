@@ -1,0 +1,160 @@
+{
+  "version": "1.0.0",
+  "automated_verification_date": "2026-10-13",
+  "data_origin": "100% synthetic; assumed parameters; no field validation",
+  "automated_tests": {
+    "passed": 64,
+    "elapsed_seconds": 92.87
+  },
+  "dependency_check": "passed",
+  "python_verification": {
+    "data_origin": "100% synthetic; assumed parameters; no field validation",
+    "package_version": "1.0.0",
+    "scope": "Full CSV replay, event evaluation, frozen calibration and reporting reconciliation; Power BI application checks are recorded separately",
+    "phases": {
+      "starter": {
+        "rows": {
+          "readings": 2160,
+          "runs": 3,
+          "truth": 2,
+          "detector_results": 4320,
+          "alarms": 4,
+          "event_evaluation": 4,
+          "run_metrics": 6
+        },
+        "status": "passed",
+        "csv_sha256": {
+          "readings": "88ae19c9e147920bf923b844cc7abe99c585a62af774b76f40bf0707d7ca3051",
+          "runs": "635c071aba68304c96f15de8a96f280ac0439f5e0fc93d7bc6550664d4ec2800",
+          "truth": "a637da823869b789db673f304779e6abaa9d63dad0066a7b4c508166b030f61d",
+          "detector_results": "d3a257b4d425646c4a1d46eace152892942d3973d26c5483be8d3b404e9fc088",
+          "alarms": "670e13fbb02fb908ad5cc764c037e2a2722440b381cc849bd597a96387925185",
+          "event_evaluation": "6d07c6fcf4793b553815f1fd1f605ad3fb3f3cbc4f57ed58e09fb30e462483b8",
+          "run_metrics": "f1d427f418f8f3e5a8b3b96c0e15cf434e724ed677c049587317d6489bd3d688"
+        }
+      },
+      "calibration": {
+        "rows": {
+          "readings": 86090,
+          "runs": 120,
+          "truth": 50,
+          "detector_results": 172180,
+          "alarms": 217,
+          "event_evaluation": 100,
+          "run_metrics": 240,
+          "comparison_exposure": 240,
+          "study_summary": 28
+        },
+        "status": "passed",
+        "csv_sha256": {
+          "readings": "d17d4b697b4c6916da90207e76c4dd5730bdcb80a6ce50b6de817456f0058c08",
+          "runs": "5249a2667004a1d6747eafebc319d6d031d9d6f40708da9c19bec9e7f208111f",
+          "truth": "fa978cbd1c266c951b18c1dc54c7949ab285d6235110077f9a0d93b697662dad",
+          "detector_results": "9e0b240735ce049dc121593c25b36d95f779b00848be23eae23375476dbfa149",
+          "alarms": "c16c2c26541e6898f96c4857600973f760bbf22b7f187d03b41662ee04574555",
+          "event_evaluation": "87832b63cd18ddfa917cd53622fe395ffdcbb798aa102f0d6607b65945cc5348",
+          "run_metrics": "87cdd362daa45b46e30e2c34072785cd21d5fa7f21e9db22cde1f42e866b3341",
+          "comparison_exposure": "ad736becdcb285827bdb96c52eedf92dd4ac362ea00100c1712a8553fad5fb47",
+          "study_summary": "283d4f3f97e13ef9c505b701ba8b1bd2c579eb738e9a07155074ea8bdbc4e5a7"
+        }
+      },
+      "test": {
+        "rows": {
+          "readings": 258270,
+          "runs": 360,
+          "truth": 150,
+          "detector_results": 516540,
+          "alarms": 8482,
+          "event_evaluation": 300,
+          "run_metrics": 720,
+          "comparison_exposure": 720,
+          "study_summary": 80
+        },
+        "status": "passed",
+        "csv_sha256": {
+          "readings": "2863261b9b71735106d1474ee450a59d02efdb9b7191ae524352c798c379dacf",
+          "runs": "a7aaa4bdf1bebb1e470ee113a86cd4168c7208a55128a1231fbcbc1c1805249b",
+          "truth": "5bcc724a43dbbbba0ba064de36d9a9ec999fcb5c77f3dad98230626c4699c29c",
+          "detector_results": "6b765a90bef80d03574a7905c504d903d1da478eaf2845bc0663e20f2cb07d70",
+          "alarms": "2567019306f28cdc7d2360eeb248733cb2b69b6cc9aeae8a0da46846a447105f",
+          "event_evaluation": "3def6e2be7ca3ac405afc504fcd56850da508f72c406186fdeffd3abf5d5c581",
+          "run_metrics": "067ceeebcf917c26f5221089df99f3da3aeecdaa4b60c08ec579dffae9c502a6",
+          "comparison_exposure": "41065e7b840a237d6efa5f9334c7b78047c1341ecd26a8fb5f01e3fa4a2d0970",
+          "study_summary": "eda6ae63551d438e7cef85491023ae6b7ae2f57bb26262d14f4a43cac77a745c"
+        }
+      }
+    },
+    "status": "passed",
+    "rule_sha256": "3d937a0cb0ec47ab385bfdf5691befd1b445bbeec642352c78db943c2809f57a",
+    "report_rows": {
+      "Runs": 480,
+      "Methods": 2,
+      "Dates": 28,
+      "Metrics": 960,
+      "Events": 400,
+      "Alarms": 8699,
+      "ModelInfo": 1,
+      "Roadmap": 4,
+      "Samples": 691200,
+      "PeriodSummary": 540,
+      "Scorecard": 10
+    },
+    "report_csv_sha256": {
+      "Runs": "94efa86bbeec38cd00a9766d26229c3c1ac6fd473f822bb09429119c97d1e441",
+      "Methods": "fb8fd75cd1cd705f32e1f7b4bf9ba9eeb7fd610ccc37e375b452cc2362a8f65f",
+      "Dates": "579ba65c7197437987e747abe2ca0deb9520a7abea50cc71ae544cf705d2ce00",
+      "Metrics": "8a7ab7e5a91933c7493ad75f2e64dbcaaf30615089625e477349dace440e441e",
+      "Events": "f7807ee2199384225a144e808143e75191d3fd5655b8923a899ae94d43d96aa6",
+      "Alarms": "57d4e4254e27298da6eac1c75e56122a4fa8a67a6b6f8fa85f28ebc7ac41d825",
+      "ModelInfo": "e69e688cd509f787cda5f0c93e65881da4726a60430eb6f514789355ce073be7",
+      "Roadmap": "7c6c8a027d09ede1aab2a615ace93e37f1de1646511f3ba92f4766c870c46d85",
+      "Samples": "f59bba011b2d6f2ffe747ca0edf09789bc75ae8ee72476e11a2065b170b73639",
+      "PeriodSummary": "598e9cc501b7e7fa2963eeb6d8919c606d699221e516605da2f5d3a6059a0c12",
+      "Scorecard": "87e2776c5240622c3ca20148d8ef5cfbf5efd56325ff9997027788d9e5ee7982"
+    }
+  },
+  "desktop_verification": {
+    "verification_date": "2026-10-11",
+    "powerbi_desktop_version": "2.158.1304.0",
+    "native_application_checks": [
+      "Refreshed local CSVs, applied query changes, no remaining import warning before save",
+      "Reopened default test/base_white/trailing scorecard: truth 50, timely 30, misses 20, false alarms 20, coverage 97.6%, P95 370 s",
+      "Reopened comparison: instant/trailing each 120 runs and 50 truth; full and shared no-leak hours retained",
+      "Reopened Event Review: test:base_white:leak_2pct:001; truth 1200-6000 s, trailing alarm 1250-6020 s, delay 50 s; full continuous elapsed-time axis",
+      "Pre-save run-switch check: leak_data_loss:001; alarm 1570 s, delay 370 s, missed 120-second target, zero eligible window, availability interruption visible",
+      "Reopened weekly/monthly page; exported 8 weekly and 2 monthly DAX rows and reconciled to Python",
+      "All three reopened pages show synthetic disclosure, V1.0.0 and rule prefix 3d937a0cb0ec"
+    ],
+    "native_exports": {
+      "weekly": {
+        "status": "passed",
+        "rows": 8,
+        "sha256": "394aab85a495c32c7e0caeb5655de9e44da2cea9846f98f14c68abd010617c5b",
+        "scope": "test/base_white/all scenarios/both methods",
+        "comparison": "integer counts exact; numeric measures within exported display rounding"
+      },
+      "monthly": {
+        "status": "passed",
+        "rows": 2,
+        "sha256": "c73c36a5a524583fc5abb1858e7e74fa5c4b51cc4cadc6178cd52992f0b59189",
+        "scope": "test/base_white/all scenarios/both methods",
+        "comparison": "integer counts exact; numeric measures within exported display rounding"
+      }
+    },
+    "limits": [
+      "Native export reconciliation covers base-white test scope; all three noise profiles and all CSV records are covered by separate Python full replay",
+      "Power BI can visually connect available readings across null gaps; these are not imputed samples and availability must be read alongside flow",
+      "Presentation dates are synthetic study weeks; no operating performance or independent-physics validation"
+    ],
+    "pbix": {
+      "bytes": 47633453,
+      "sha256": "14ded749b5912a279a5eb763b702125a8db85091eef83b1b93057eba7a9c64fa",
+      "desktop_saved": true,
+      "closed_and_reopened_exact_path": true,
+      "zip_integrity": "passed",
+      "embedded_model": true,
+      "filename": "Pipeline_V1.pbix"
+    }
+  },
+  "artifact_identity": "Release PBIX bytes match the report saved and reopened in Desktop on 2026-10-11"
+}

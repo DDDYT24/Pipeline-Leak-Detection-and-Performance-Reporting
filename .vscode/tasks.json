@@ -5,65 +5,54 @@
       "label": "Generate starter CSV data",
       "type": "process",
       "command": "${workspaceFolder}/.venv/Scripts/python.exe",
-      "args": [
-        "-m",
-        "pipeline_leak_detection",
-        "--config",
-        "configs/starter.json"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
+      "args": ["-m", "pipeline_leak_detection", "--config", "configs/starter.json"],
+      "options": {"cwd": "${workspaceFolder}"},
       "problemMatcher": []
     },
     {
       "label": "Run project tests",
       "type": "process",
       "command": "${workspaceFolder}/.venv/Scripts/python.exe",
-      "args": [
-        "-m",
-        "pytest",
-        "-q"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
+      "args": ["-m", "pytest", "-q"],
+      "options": {"cwd": "${workspaceFolder}"},
       "problemMatcher": []
     },
     {
       "label": "Calibrate and freeze study rule",
       "type": "process",
       "command": "${workspaceFolder}/.venv/Scripts/python.exe",
-      "args": [
-        "-m",
-        "pipeline_leak_detection",
-        "--study",
-        "configs/study.json",
-        "--phase",
-        "calibration"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
+      "args": ["-m", "pipeline_leak_detection", "--study", "configs/study.json", "--phase", "calibration"],
+      "options": {"cwd": "${workspaceFolder}"},
       "problemMatcher": []
     },
     {
       "label": "Generate held-out study test",
       "type": "process",
       "command": "${workspaceFolder}/.venv/Scripts/python.exe",
-      "args": [
-        "-m",
-        "pipeline_leak_detection",
-        "--study",
-        "configs/study.json",
-        "--phase",
-        "test",
-        "--frozen-rule",
-        "data/generated/study/calibration/frozen_rule.json"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
+      "args": ["-m", "pipeline_leak_detection", "--study", "configs/study.json", "--phase", "test", "--frozen-rule", "data/generated/study/calibration/frozen_rule.json"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": []
+    },
+    {
+      "label": "Build V1 report inputs and project",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": ["-m", "pipeline_leak_detection.reporting"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": []
+    },
+    {
+      "label": "Verify complete V1 replay and reporting",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": ["-m", "pipeline_leak_detection.verification"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": []
+    },
+    {
+      "label": "Rebuild synthetic V1 exports",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Generate starter CSV data", "Calibrate and freeze study rule", "Generate held-out study test", "Build V1 report inputs and project"],
       "problemMatcher": []
     }
   ]
